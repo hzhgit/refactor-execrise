@@ -47,7 +47,7 @@ function volumeCredits(invoice, plays) {
   return volumeCredits
 }
 
-function renderText(invoice, plays){
+function renderText(invoice, plays) {
   let result = `Statement for ${invoice.customer}\n`;
   for (let perf of invoice.performances) {
     const play = plays[perf.playID];
@@ -59,8 +59,18 @@ function renderText(invoice, plays){
   return result;
 }
 
-function renderHtml(){
-  return null;
+function renderHtml(invoice, plays) {
+  let result = `<h1>Statement for ${invoice.customer}</h1>\n`
+  result += '<table>\n'
+  result += '<tr><th>play</th><th>seats</th><th>cost</th></tr>'
+  for (let perf of invoice.performances) {
+    const play = plays[perf.playID];
+    result += ` <tr><td>${play.name}</td><td>${perf.audience}</td><td>${usd(amountFor(perf, play))}</td></tr>\n`;
+  }
+  result += '</table>\n'
+  result += `<p>Amount owed is <em>${usd(getTotalAmount(invoice, plays))}</em></p>\n`
+  result += `<p>You earned <em>${volumeCredits(invoice, plays)}</em> credits</p>\n`
+  return result;
 }
 
 function statement(invoice, plays) {
