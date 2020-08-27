@@ -47,38 +47,57 @@ function volumeCredits(invoice, plays) {
   return volumeCredits
 }
 
-function renderText(invoice, plays) {
-  let result = `Statement for ${invoice.customer}\n`;
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
-    result += ` ${play.name}: ${usd(amountFor(perf, play))} (${perf.audience} seats)\n`;
+function renderText(data) {
+  let result = `Statement for ${data.customer}\n`;
+  for (let perf of data.performances) {
+    result += ` ${perf.name}: ${perf.thisAmount} (${perf.audience} seats)\n`;
   }
 
-  result += `Amount owed is ${usd(getTotalAmount(invoice, plays))}\n`;
-  result += `You earned ${volumeCredits(invoice, plays)} credits \n`;
+  result += `Amount owed is ${data.totalAmount}\n`;
+  result += `You earned ${data.volumeCredits} credits \n`;
   return result;
 }
 
-function renderHtml(invoice, plays) {
-  let result = `<h1>Statement for ${invoice.customer}</h1>\n`
+function renderHtml(data) {
+  let result = `<h1>Statement for ${data.customer}</h1>\n`
   result += '<table>\n'
   result += '<tr><th>play</th><th>seats</th><th>cost</th></tr>'
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
-    result += ` <tr><td>${play.name}</td><td>${perf.audience}</td><td>${usd(amountFor(perf, play))}</td></tr>\n`;
+  for (let perf of data.performances) {
+    result += ` <tr><td>${perf.name}</td><td>${perf.audience}</td><td>${perf.thisAmount}</td></tr>\n`;
   }
   result += '</table>\n'
-  result += `<p>Amount owed is <em>${usd(getTotalAmount(invoice, plays))}</em></p>\n`
-  result += `<p>You earned <em>${volumeCredits(invoice, plays)}</em> credits</p>\n`
+  result += `<p>Amount owed is <em>${data.totalAmount}</em></p>\n`
+  result += `<p>You earned <em>${data.volumeCredits}</em> credits</p>\n`
   return result;
+}
+
+function getData(invoice, plays){
+    let data = {
+        customer:'',
+        totalAmount:'',
+        volumeCredits:'',
+        performances:[]
+    }
+    data.customer = invoice.customer
+    data.totalAmount = usd(getTotalAmount(invoice, plays))
+    data.volumeCredits = volumeCredits(invoice, plays)
+    for (let perf of invoice.performances) {
+        const play = plays[perf.playID];
+        data.performances.push({
+            name:play.name,
+            thisAmount:usd(amountFor(perf, play)),
+            audience:perf.audience
+        });
+    }
+    return data
 }
 
 function statement(invoice, plays) {
-  return renderText(invoice, plays)
+  return renderText(getData(invoice, plays))
 }
 
 function statementHtml(invoice, plays) {
-  return renderHtml(invoice, plays);
+  return renderHtml(getData(invoice, plays));
 }
 
 module.exports = {
