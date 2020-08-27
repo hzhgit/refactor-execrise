@@ -47,7 +47,7 @@ function volumeCredits(invoice, plays) {
   return volumeCredits
 }
 
-function setResult(invoice, plays){
+function renderText(invoice, plays){
   let result = `Statement for ${invoice.customer}\n`;
   for (let perf of invoice.performances) {
     const play = plays[perf.playID];
@@ -59,8 +59,10 @@ function setResult(invoice, plays){
   return result;
 }
 
+
+
 function statement(invoice, plays) {
-  return setResult(invoice, plays)
+  return renderText(invoice, plays)
 }
 
 module.exports = {
