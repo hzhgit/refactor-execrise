@@ -59,12 +59,19 @@ function renderText(invoice, plays){
   return result;
 }
 
-
+function renderHtml(){
+  return null;
+}
 
 function statement(invoice, plays) {
   return renderText(invoice, plays)
 }
 
+function statementHtml(invoice, plays) {
+  return renderHtml(invoice, plays);
+}
+
 module.exports = {
   statement,
+  statementHtml
 };
