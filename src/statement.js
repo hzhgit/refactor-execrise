@@ -1,4 +1,4 @@
-function usd(amout){
+function usd(amout) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -6,7 +6,7 @@ function usd(amout){
   }).format(amout / 100);
 }
 
-function amountFor(aPerformance,play){
+function amountFor(aPerformance, play) {
   let thisAmount = 0;
   switch (play.type) {
     case 'tragedy':
@@ -28,9 +28,17 @@ function amountFor(aPerformance,play){
   return thisAmount;
 }
 
-
-function statement (invoice, plays) {
+function getTotalAmount(invoice,plays) {
   let totalAmount = 0;
+  for (let perf of invoice.performances) {
+    const play = plays[perf.playID];
+    totalAmount += amountFor(perf, play);
+  }
+  return totalAmount
+}
+
+function statement(invoice, plays) {
+  // let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
   for (let perf of invoice.performances) {
@@ -40,10 +48,11 @@ function statement (invoice, plays) {
     // add extra credit for every ten comedy attendees
     if ('comedy' === play.type) volumeCredits += Math.floor(perf.audience / 5);
     //print line for this order
-    result += ` ${play.name}: ${usd(amountFor(perf,play))} (${perf.audience} seats)\n`;
-    totalAmount += amountFor(perf,play);
+    result += ` ${play.name}: ${usd(amountFor(perf, play))} (${perf.audience} seats)\n`;
+    // totalAmount += amountFor(perf, play);
   }
-  result += `Amount owed is ${usd(totalAmount)}\n`;
+  
+  result += `Amount owed is ${usd(getTotalAmount(invoice,plays))}\n`;
   result += `You earned ${volumeCredits} credits \n`;
   return result;
 }
